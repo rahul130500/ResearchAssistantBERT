@@ -1,0 +1,340 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <title>Bert Question Answering</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta property="og:title" content="Bert Model-by Bhargav Saikia">
+  <meta property="og:image" content="/images/bert.png" />
+  <meta property="og:description" content="BERT stands for Bidirectional Encoder Representations from Transformers.">
+  <meta property="og:url" content="https://huntu-research-assist.herokuapp.com/" />
+  <meta property="og:type" content="website" />
+  <link href="//netdna.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" rel="stylesheet" media="screen" />
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/particles.js/2.0.0/particles.min.js"
+    integrity="sha512-Kef5sc7gfTacR7TZKelcrRs15ipf7+t+n7Zh6mKNJbmW+/RRdCW9nwfLn4YX0s2nO6Kv5Y2ChqgIakaC6PW09A=="
+    crossorigin="anonymous"></script>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Quicksand:wght@300;400;500;600&display=swap');
+
+    * {
+      font-family: 'Quicksand', sans-serif;
+      color: white;
+    }
+
+    header {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      z-index: 100;
+      display: flex;
+      padding: 40px 40px 0;
+      align-items: center;
+    }
+
+    header .title {
+      flex-grow: 1;
+      margin-left: 20px;
+      font-size: 0.6em;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+      padding-bottom: 10px;
+    }
+
+    header h1 {
+      color: #fff;
+      margin: 0;
+      display: inline;
+    }
+
+    header h1 a:hover {
+      text-shadow: 0px 0px 5px #fff;
+    }
+
+    header .pizza-svg {
+      width: 80px;
+      overflow: visible;
+      stroke: #fff;
+      stroke-width: 4;
+      stroke-linejoin: round;
+      stroke-linecap: round;
+    }
+
+    .container {
+      position: absolute;
+      top: 30vh;
+      left: 25vw;
+      width: 50vw;
+      height: 50vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      padding: 0 10%;
+      z-index: inherit 1;
+    }
+
+    #predict {
+      color: white;
+      padding: 10px 30px;
+      font-size: 1em;
+      background: rgba(0, 0, 0, 0.1);
+      border-radius: 10px;
+      border: 1px solid white;
+      cursor: pointer;
+    }
+
+    textarea:focus,
+    input:focus {
+      outline: 0px !important;
+      -webkit-appearance: none;
+      box-shadow: none !important;
+      -webkit-animation: textanima 1s infinite;
+      -moz-animation: textanima 1s infinite;
+      -o-animation: textanima 1s infinite;
+      animation: textanima 1s infinite;
+    }
+
+    #predict:hover {
+      -webkit-animation: btnanima 0.5s infinite;
+      -moz-animation: btnanima 0.5s infinite;
+      -o-animation: btnanima 0.5s infinite;
+      animation: btnanima 0.5s infinite;
+    }
+
+    @keyframes btnanima {
+      form {
+        transform: scale(1);
+        text-shadow: 0px 0px 0px #fff;
+        box-shadow: 0px 0px 0px #fff;
+      }
+
+      to {
+        transform: scale(1.015);
+        text-shadow: 0px 0px 8px #fff;
+        box-shadow: 0px 0px 8px #fff;
+      }
+    }
+
+    @keyframes textanima {
+      form {
+        border: 1px solid rgba(255, 255, 255, 0.1);
+      }
+
+      to {
+        border: 1.1px solid rgba(255, 255, 255, 0.9);
+      }
+    }
+
+    #particles-js {
+      position: absolute;
+      top: 0;
+      left: 0;
+      height: 100vh;
+      width: 100vw;
+      background-color: rgb(0, 0, 0);
+      background: radial-gradient(circle,
+          rgba(100, 0, 123, 1) 0%,
+          rgba(62, 20, 86, 1) 100%);
+    }
+
+    @media only screen and (max-width: 550px) {
+      .container {
+        top: 25vh;
+        left: 5vw;
+        width: 90vw;
+      }
+
+      header h1 {
+        font-size: 30px;
+      }
+
+      header .pizza-svg {
+        width: 60px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <header>
+    
+    <div class="title">
+      <h1><a href="https://en.wikipedia.org/wiki/BERT_(language_model)"
+          style="text-decoration: none; color: white;">Research Assistant</a>
+      </h1>
+    </div>
+  </header>
+  <div id="particles-js">
+    <canvas class="particles-js-canvas-el" width="973" height="1171" style="width: 100%; height: 100%">
+    </canvas>
+  </div>
+  <div class="container">
+    <div class="row-sm-5 row-sm-offset-1" style="width: 100%;">
+      <h4 style="margin-bottom: 1.5rem;">FILL THE TEXT FIELDS TO TEST BERT ...</h4>
+      <form role="form" method="POST" action="/">
+        <div class="form-group">
+          <textarea style="width: 100%;border-radius: 10px;background: rgba(0,0,0,0.1);color: white;padding: 20px;"
+            name="paragraph" class="form-control" id="url-box" placeholder="Enter a paragraph" style="max-width: 300px"
+            autofocus required>{% if result %}
+            {{ result[2] }}
+            {% endif %}</textarea>
+          <br />
+          <input style="width: 100%;border-radius: 10px;background: rgba(0,0,0,0.1);color: white;padding: 20px;"
+            type="text" name="question" class="form-control" id="url-box" placeholder="Enter a question"
+            style="max-width: 300px" autofocus required />
+        </div>
+        <button type="submit" id="predict">Predict</button>
+      </form>
+      <br />
+    </div>
+
+    <div class="row-sm-5 row-sm-offset-1" style="width: 100%;">
+      {% if result %}
+      <h4 style="color: white;">Question = {{ result[0] }}</h4>
+      <h4 style="color: white;">Answer= {{ result[1] }}</h4>
+      {% endif %}
+    </div>
+  </div>
+  <script>
+    particlesJS("particles-js", {
+      particles: {
+        number: {
+          value: 80,
+          density: {
+            enable: true,
+            value_area: 800,
+          },
+        },
+        color: {
+          value: "#ffffff",
+        },
+        shape: {
+          type: "circle",
+          stroke: {
+            width: 0,
+            color: "#000000",
+          },
+          polygon: {
+            nb_sides: 7,
+          },
+          image: {
+            src: "img/github.svg",
+            width: 100,
+            height: 100,
+          },
+        },
+        opacity: {
+          value: 0.5,
+          random: false,
+          anim: {
+            enable: false,
+            speed: 1,
+            opacity_min: 0.1,
+            sync: false,
+          },
+        },
+        size: {
+          value: 3,
+          random: true,
+          anim: {
+            enable: false,
+            speed: 20,
+            size_min: 0.1,
+            sync: false,
+          },
+        },
+        line_linked: {
+          enable: true,
+          distance: 150,
+          color: "#ffffff",
+          opacity: 0.4,
+          width: 1,
+        },
+        move: {
+          enable: true,
+          speed: 1,
+          direction: "none",
+          random: false,
+          straight: false,
+          out_mode: "out",
+          bounce: false,
+          attract: {
+            enable: false,
+            rotateX: 600,
+            rotateY: 1200,
+          },
+        },
+      },
+      interactivity: {
+        detect_on: "canvas",
+        events: {
+          onhover: {
+            enable: true,
+            mode: "grab",
+          },
+          onclick: {
+            enable: true,
+            mode: "push",
+          },
+          resize: true,
+        },
+        modes: {
+          grab: {
+            distance: 400,
+            line_linked: {
+              opacity: 1,
+            },
+          },
+          bubble: {
+            distance: 400,
+            size: 40,
+            duration: 2,
+            opacity: 8,
+            speed: 3,
+          },
+          repulse: {
+            distance: 200,
+            duration: 0.4,
+          },
+          push: {
+            particles_nb: 4,
+          },
+          remove: {
+            particles_nb: 2,
+          },
+        },
+      },
+      retina_detect: true,
+    });
+    var count_particles, stats, update;
+    stats = new Stats();
+    stats.setMode(0);
+    stats.domElement.style.position = "absolute";
+    stats.domElement.style.left = "0px";
+    stats.domElement.style.top = "0px";
+    document.body.appendChild(stats.domElement);
+    count_particles = document.querySelector(".js-count-particles");
+    update = function () {
+      stats.begin();
+      stats.end();
+      if (
+        window.pJSDom[0].pJS.particles &&
+        window.pJSDom[0].pJS.particles.array
+      ) {
+        count_particles.innerText =
+          window.pJSDom[0].pJS.particles.array.length;
+      }
+      requestAnimationFrame(update);
+    };
+    requestAnimationFrame(update);
+  </script>
+</body>
+
+</html>
+
+
+<!-- inside textarea:-
+
+{% if result %}
+{{ result[2] }}
+{% endif %} -->
